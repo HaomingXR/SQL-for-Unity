@@ -11,19 +11,15 @@ public class DBUtil
     private static string sqlQuery;
     private static string queryResult;
 
-    private const string DatabaseName = "Data.db";
-    private static string filepath { get { return Application.persistentDataPath + "/" + DatabaseName; } }
     public static bool dbLoaded { get; private set; }
-
-    public enum Category { Int, Char }
 
     /// <summary>
     /// Load the Database
     /// </summary>
-    public static void LoadDatabase()
+    public static void LoadDatabase(string database)
     {
         dbLoaded = false;
-        string conn = "URI=file:" + filepath;
+        string conn = "URI=file:" + Application.persistentDataPath + "/" + database;
         dbConn = new SqliteConnection(conn);
         dbConn.Open();
         dbLoaded = true;
@@ -47,33 +43,18 @@ public class DBUtil
     /// Create a new Table
     /// </summary>
     /// <param name="Table">The name of the Table</param>
-    /// <param name="pairs">Pairs of (Columns, Data Type) </param>
-    public static void CreateTable(string Table, params Tuple<string, Category>[] pairs)
+    /// <param name="pairs">
+    /// Tuple pairs of (Column, Value)
+    /// eg. INTEGER, BOOL, VARCHAR(size), DATE
+    /// </param>
+    public static void CreateTable(string Table, params Tuple<string, string>[] pairs)
     {
         sqlQuery = $"CREATE TABLE {Table} (";
 
-        switch (pairs[0].Item2)
-        {
-            case Category.Int:
-                sqlQuery += $"{pairs[0].Item1} INTEGER";
-                break;
-            case Category.Char:
-                sqlQuery += $"{pairs[0].Item1} varchar(100)";
-                break;
-        }
+        sqlQuery += $"{pairs[0].Item1} {pairs[0].Item2}";
 
         for (int i = 1; i < pairs.Length; i++)
-        {
-            switch (pairs[i].Item2)
-            {
-                case Category.Int:
-                    sqlQuery += $", {pairs[i].Item1} INTEGER";
-                    break;
-                case Category.Char:
-                    sqlQuery += $", {pairs[i].Item1} varchar(100)";
-                    break;
-            }
-        }
+            sqlQuery += $", {pairs[i].Item1} {pairs[i].Item2}";
 
         sqlQuery += ")";
 
@@ -160,8 +141,7 @@ public class DBUtil
             for (int i = 1; i < l; i++)
                 sqlQuery += ", " + columns[i];
 
-            sqlQuery += " FROM ";
-            sqlQuery += table;
+            sqlQuery += $" FROM {table}";
 
             IDbCommand dbCMD = dbConn.CreateCommand();
             dbCMD.CommandText = sqlQuery;
@@ -190,6 +170,26 @@ public class DBUtil
             return queryResult;
         }
         catch { return null; }
+    }
+
+    /// <summary>
+    /// Run commands not provided by the APIs
+    /// </summary>
+    /// <returns>True if Successful; False otherwise</returns>
+    public static bool RunCustomCommand(string cmd)
+    {
+        try
+        {
+            IDbCommand dbCMD = dbConn.CreateCommand();
+            dbCMD.CommandText = cmd;
+            dbCMD.ExecuteReader();
+            dbCMD.Dispose();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public static void Terminate()
