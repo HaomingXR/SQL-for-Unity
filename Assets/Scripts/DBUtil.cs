@@ -1,7 +1,6 @@
 using Mono.Data.Sqlite;
 using System;
 using System.Data;
-using UnityEditor.Search;
 using UnityEngine;
 
 public class DBUtil
@@ -91,6 +90,13 @@ public class DBUtil
         dbCMD.Dispose();
     }
 
+    /// <summary>
+    /// Modify the data of a specific row
+    /// </summary>
+    /// <param name="table">Table to modify data from</param>
+    /// <param name="column">(Column to modify, new Value)</param>
+    /// <param name="id">(Column to filter, condition value)</param>
+    /// <returns>True if Successful; False otherwise</returns>
     public static bool ModifyData(string table, Tuple<string, string> column, Tuple<string, string> id)
     {
         try
@@ -116,7 +122,6 @@ public class DBUtil
     /// <param name="table">The table to filter</param>
     /// <param name="condition">The column to filter</param>
     /// <param name="value">The value to filter for</param>
-    /// <returns></returns>
     public static string QueryAllWithFilter(string table, string condition, string value)
     {
         try
@@ -148,7 +153,6 @@ public class DBUtil
     /// <param name="table">Table :skull:</param>
     /// <param name="verbose">True: Return string also contains the column name; False: Plain string containing only the values</param>
     /// <param name="columns">Columns to get value from</param>
-    /// <returns></returns>
     public static string Query(string table, bool verbose = true, params string[] columns)
     {
         try
@@ -210,6 +214,34 @@ public class DBUtil
         {
             return false;
         }
+    }
+
+    /// <summary>
+    /// Run commands to get specific data
+    /// </summary>
+    public static string GetCustomeData(string cmd)
+    {
+        try
+        {
+            sqlQuery = cmd;
+
+            IDbCommand dbCMD = dbConn.CreateCommand();
+            dbCMD.CommandText = sqlQuery;
+            IDataReader reader = dbCMD.ExecuteReader();
+
+            queryResult = string.Empty;
+
+            while (reader.Read())
+            {
+                for (int i = 0; i < reader.FieldCount; i++)
+                    queryResult += $"{reader.GetValue(i)} ";
+                queryResult += "\n";
+            }
+
+            dbCMD.Dispose();
+            return queryResult;
+        }
+        catch { return null; }
     }
 
     public static void Terminate()
