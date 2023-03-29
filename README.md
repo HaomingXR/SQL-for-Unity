@@ -1,4 +1,4 @@
-# SQL-for-Unity-Android
+# SQL for Unity Android
 - A series of APIs that access SQLite Database from Unity, on both PC and Android Platforms
 - Tested on Meta Quest 2 & Unity Editor
 
@@ -14,6 +14,7 @@ Currently provide a few simple APIs to call easily without having to know SQL co
 
 If the above commands are ~~trash~~ not adequate, you can also:
 - `RunCustomCommand`: Run a command you specified
+- `GetCustomeData`: Run a command you specified and return the results
 
 ### Reference
 - https://github.com/walidabazo/SQLiteUnity3d_Android
