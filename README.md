@@ -12,7 +12,7 @@ Currently provide a few simple APIs to call easily without having to know SQL co
 - `Query`: Retrive a string containing the data in specified **columns** of specified **table**
 - `QueryAllWithFilter`: Retrive a string containing the data in a specific row of a **table**, according to **condition**
 
-If the above commands are~~ trash ~~not adequate, you can also:
+If the above commands are ~~trash~~ not adequate, you can also:
 - `RunCustomCommand`: Run a command you specified
 
 ### Reference
