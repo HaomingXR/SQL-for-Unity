@@ -1,6 +1,7 @@
 using Mono.Data.Sqlite;
 using System;
 using System.Data;
+using UnityEditor.Search;
 using UnityEngine;
 
 public class DBUtil
@@ -88,6 +89,25 @@ public class DBUtil
         dbCMD.CommandText = sqlQuery;
         dbCMD.ExecuteScalar();
         dbCMD.Dispose();
+    }
+
+    public static bool ModifyData(string table, Tuple<string, string> column, Tuple<string, string> id)
+    {
+        try
+        {
+            sqlQuery = $"UPDATE {table} SET {column.Item1} = {column.Item2} WHERE {id.Item1} = {id.Item2}";
+
+            IDbCommand dbCMD = dbConn.CreateCommand();
+            dbCMD.CommandText = sqlQuery;
+            dbCMD.ExecuteReader();
+            dbCMD.Dispose();
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>

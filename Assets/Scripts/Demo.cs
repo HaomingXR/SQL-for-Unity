@@ -31,11 +31,15 @@ public class Demo : MonoBehaviour
             DBUtil.InsertData("Number", Tuple.Create("ID", "1"), Tuple.Create("Data", "87564231"));
         }
 
+        DBUtil.ModifyData("Number", Tuple.Create("Data", "789"), Tuple.Create("ID", "3"));
         resultText.text = DBUtil.Query("Number", true, "ID", "Data");
         yield return new WaitForSeconds(2.5f);
         resultText.text = DBUtil.Query("Number", false, "Data");
         yield return new WaitForSeconds(2.5f);
         resultText.text = DBUtil.QueryAllWithFilter("Number", "ID", "1");
+        yield return new WaitForSeconds(2.5f);
+        DBUtil.ModifyData("Number", Tuple.Create("Data", "999"), Tuple.Create("ID", "3"));
+        resultText.text = DBUtil.Query("Number", true, "ID", "Data");
     }
 
     void OnApplicationQuit()
