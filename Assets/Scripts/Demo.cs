@@ -1,4 +1,4 @@
-using System;
+using HaomingSQL;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +10,7 @@ public class Demo : MonoBehaviour
 
     void Awake()
     {
-        DBUtil.LoadDatabase("Data.db");
+        DBUtil.LoadDatabase("Demo.db");
     }
 
     IEnumerator Start()
@@ -21,25 +21,29 @@ public class Demo : MonoBehaviour
 
         if (!DBUtil.Verify())
         {
-            DBUtil.CreateTable("Number", Tuple.Create("ID", "INT"), Tuple.Create("Data", "INT"));
+            DBUtil.CreateTable("Showcase", new ColumnStruct("ID", "INT"), new ColumnStruct("Data", "VARCHAR(256)"));
 
-            DBUtil.InsertData("Number", Tuple.Create("ID", "1"), Tuple.Create("Data", "123"));
-            DBUtil.InsertData("Number", Tuple.Create("ID", "2"), Tuple.Create("Data", "456"));
-            DBUtil.InsertData("Number", Tuple.Create("ID", "3"), Tuple.Create("Data", "789"));
-            DBUtil.InsertData("Number", Tuple.Create("ID", "4"), Tuple.Create("Data", "135"));
-            DBUtil.InsertData("Number", Tuple.Create("ID", "5"), Tuple.Create("Data", "246"));
-            DBUtil.InsertData("Number", Tuple.Create("ID", "1"), Tuple.Create("Data", "87564231"));
+            DBUtil.InsertData("Showcase", new ColumnStruct("ID", "1"), new ColumnStruct("Data", DBUtil.ToStr("Alpha")));
+            DBUtil.InsertData("Showcase", new ColumnStruct("ID", "2"), new ColumnStruct("Data", DBUtil.ToStr("Beta")));
+            DBUtil.InsertData("Showcase", new ColumnStruct("ID", "3"), new ColumnStruct("Data", DBUtil.ToStr("Gamma")));
         }
+        else
+            DBUtil.ModifyData("Showcase", new ColumnStruct("Data", DBUtil.ToStr("Gamma")), new ColumnStruct("ID", "3"));
 
-        DBUtil.ModifyData("Number", Tuple.Create("Data", "789"), Tuple.Create("ID", "3"));
-        resultText.text = DBUtil.Query("Number", true, "ID", "Data");
-        yield return new WaitForSeconds(2.5f);
-        resultText.text = DBUtil.Query("Number", false, "Data");
-        yield return new WaitForSeconds(2.5f);
-        resultText.text = DBUtil.QueryAllWithFilter("Number", "ID", "1");
-        yield return new WaitForSeconds(2.5f);
-        DBUtil.ModifyData("Number", Tuple.Create("Data", "999"), Tuple.Create("ID", "3"));
-        resultText.text = DBUtil.Query("Number", true, "ID", "Data");
+        resultText.text = string.Join(", ", DBUtil.Query("Showcase", "ID", "Data"));
+
+        yield return new WaitForSeconds(2.0f);
+
+        DBUtil.ModifyData("Showcase", new ColumnStruct("Data", DBUtil.ToStr("Theta")), new ColumnStruct("ID", "3"));
+        resultText.text = string.Join(", ", DBUtil.Query("Showcase", "ID", "Data"));
+
+        yield return new WaitForSeconds(2.0f);
+
+        resultText.text = string.Join(", ", DBUtil.Query("Showcase", "Data"));
+
+        yield return new WaitForSeconds(2.0f);
+
+        resultText.text = string.Join(", ", DBUtil.QueryAllWithFilter("Showcase", "ID", "1"));
     }
 
     void OnApplicationQuit()
