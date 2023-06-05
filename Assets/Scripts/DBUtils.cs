@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using UnityEngine;
 
-namespace HaomingSQL
+namespace SQL.APIs
 {
-    public class DBUtil
+    public class DBUtils
     {
         private static IDbConnection dbConn;
 
@@ -17,8 +17,9 @@ namespace HaomingSQL
         public static string ToStr(string input) => $"\"{input}\"";
 
         /// <summary>
-        /// Load the Database
+        /// Load a Database in persistentDataPath 
         /// </summary>
+        /// <param name="database">Filename ends in ".db"</param>
         public static void LoadDatabase(string database)
         {
             dbLoaded = false;
@@ -40,34 +41,29 @@ namespace HaomingSQL
         public static bool Verify()
         {
             sqlQuery = "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table'";
-            bool result = false;
 
             using (IDbCommand dbCMD = dbConn.CreateCommand())
             {
                 dbCMD.CommandText = sqlQuery;
                 using (IDataReader reader = dbCMD.ExecuteReader())
-                    result = reader.GetValue(0).ToString() != "0";
+                    return reader.GetValue(0).ToString() != "0";
             }
-
-            return result;
         }
 
         /// <summary>
         /// Check if a value exists in the database
         /// </summary>
+        /// <returns>True if value Exists; False otherwise</returns>
         public static bool CheckEntry(string Table, ColumnStruct pair)
         {
             sqlQuery = $"SELECT EXISTS(SELECT 1 FROM {Table} WHERE {pair.Name} = {pair.Data}) as exist";
-            bool result = false;
 
             using (IDbCommand dbCMD = dbConn.CreateCommand())
             {
                 dbCMD.CommandText = sqlQuery;
                 using (IDataReader reader = dbCMD.ExecuteReader())
-                    result = reader.GetValue(0).ToString() != "0";
+                    return reader.GetValue(0).ToString() != "0";
             }
-
-            return result;
         }
 
         /// <summary>
@@ -129,7 +125,6 @@ namespace HaomingSQL
         /// <param name="table">Table to modify data from</param>
         /// <param name="change">(Column to modify, new Value)</param>
         /// <param name="condition">(Column to filter, condition value)</param>
-        /// <returns>True if Successful; False otherwise</returns>
         public static void ModifyData(string table, ColumnStruct change, ColumnStruct condition)
         {
             sqlQuery = $"UPDATE {table} SET {change.Name} = {change.Data} WHERE {condition.Name} = {condition.Data}";
@@ -151,16 +146,13 @@ namespace HaomingSQL
         public static string QuerySingleWithFilter(string table, string target, string condition, string value)
         {
             sqlQuery = $"SELECT {target} FROM {table} WHERE {condition} = {value}";
-            string result = string.Empty;
 
             using (IDbCommand dbCMD = dbConn.CreateCommand())
             {
                 dbCMD.CommandText = sqlQuery;
                 using (IDataReader reader = dbCMD.ExecuteReader())
-                    result = reader.GetValue(0).ToString();
+                    return reader.GetValue(0).ToString();
             }
-
-            return result;
         }
 
         /// <summary>
